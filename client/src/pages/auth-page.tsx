@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocation } from "wouter";
 import { Loader2 } from "lucide-react";
+import type { LoginData } from "@/hooks/use-auth";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
@@ -44,7 +45,7 @@ export default function AuthPage() {
           </CardContent>
         </Card>
       </div>
-      
+
       <div className="hidden lg:flex flex-1 bg-primary items-center justify-center p-8">
         <div className="max-w-lg text-white">
           <h1 className="text-4xl font-bold mb-4">Your Personal Health Platform</h1>
@@ -59,8 +60,12 @@ export default function AuthPage() {
 
 function LoginForm() {
   const { loginMutation } = useAuth();
-  const form = useForm({
+  const form = useForm<LoginData>({
     resolver: zodResolver(insertUserSchema.pick({ username: true, password: true })),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
   });
 
   return (
@@ -105,6 +110,14 @@ function RegisterForm() {
   const { registerMutation } = useAuth();
   const form = useForm({
     resolver: zodResolver(insertUserSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      fullName: "",
+      email: "",
+      dateOfBirth: "",
+      gender: "",
+    },
   });
 
   return (
