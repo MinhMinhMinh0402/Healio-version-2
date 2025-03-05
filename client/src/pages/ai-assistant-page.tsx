@@ -2,7 +2,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation } from "@tanstack/react-query";
-import { Brain, Loader2 } from "lucide-react";
+import { Brain, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type SymptomCategory = 
   | "Head & Neurological" 
@@ -24,28 +25,36 @@ export default function AiAssistantPage() {
   const [category, setCategory] = useState<SymptomCategory | null>(null);
   const [symptoms, setSymptoms] = useState("");
   const [analysis, setAnalysis] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const analyzeSymptoms = useMutation({
     mutationFn: async (data: { category: SymptomCategory; symptoms: string }) => {
+      setError(null);
       const res = await apiRequest("POST", "/api/ai-analysis", {
         userId: user?.id,
         category: data.category,
         symptoms: data.symptoms,
         date: new Date().toISOString(),
       });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Unable to analyze symptoms");
+      }
       return res.json();
     },
     onSuccess: (data) => {
       setAnalysis(data.analysis);
       toast({
         title: "Analysis Complete",
-        description: "Your symptoms have been analyzed",
+        description: "Your symptoms have been analyzed successfully",
       });
     },
     onError: (error: Error) => {
+      setError(error.message);
+      setAnalysis(null);
       toast({
-        title: "Analysis Failed",
-        description: error.message,
+        title: "Could Not Complete Analysis",
+        description: "Please try again in a few moments",
         variant: "destructive",
       });
     },
@@ -55,7 +64,7 @@ export default function AiAssistantPage() {
     if (!category || !symptoms.trim()) {
       toast({
         title: "Missing Information",
-        description: "Please select a category and describe your symptoms",
+        description: "Please select a symptom category and describe your symptoms",
         variant: "destructive",
       });
       return;
@@ -119,7 +128,10 @@ export default function AiAssistantPage() {
                 className="w-full bg-primary text-white"
               >
                 {analyzeSymptoms.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing...
+                  </>
                 ) : (
                   "Analyze Symptoms"
                 )}
@@ -134,7 +146,14 @@ export default function AiAssistantPage() {
                 <h2 className="text-lg font-medium">AI Analysis</h2>
               </div>
 
-              {analysis ? (
+              {error ? (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="ml-2">
+                    Our AI system is currently unavailable. Please try again in a few moments.
+                  </AlertDescription>
+                </Alert>
+              ) : analysis ? (
                 <div className="prose prose-sm">
                   <p className="text-gray-700 whitespace-pre-wrap">{analysis}</p>
                 </div>
@@ -146,7 +165,7 @@ export default function AiAssistantPage() {
                       <p>Analyzing your symptoms...</p>
                     </div>
                   ) : (
-                    "Describe your symptoms and our AI will provide a preliminary analysis"
+                    "Select a category and describe your symptoms for an AI-powered analysis"
                   )}
                 </div>
               )}

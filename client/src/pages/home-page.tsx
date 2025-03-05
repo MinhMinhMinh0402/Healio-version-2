@@ -42,49 +42,6 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Quick Actions */}
-          <div className="bg-white p-6 rounded-xl shadow-sm mb-6">
-            <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Link href="/appointments">
-                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="font-medium">Book Appointment</p>
-                    <p className="text-sm text-gray-500">Schedule a visit</p>
-                  </div>
-                </a>
-              </Link>
-              <Link href="/ai-assistant">
-                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
-                  <Bot className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="font-medium">AI Assistant</p>
-                    <p className="text-sm text-gray-500">Get health advice</p>
-                  </div>
-                </a>
-              </Link>
-              <Link href="/health-records">
-                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
-                  <FileText className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="font-medium">View Records</p>
-                    <p className="text-sm text-gray-500">Medical history</p>
-                  </div>
-                </a>
-              </Link>
-              <Link href="/profile">
-                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
-                  <User className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="font-medium">Update Profile</p>
-                    <p className="text-sm text-gray-500">Manage account</p>
-                  </div>
-                </a>
-              </Link>
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <Card className="bg-blue-50 border-none">
               <CardHeader className="pb-2">
@@ -143,7 +100,7 @@ export default function HomePage() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm font-medium">Recent Health Records</CardTitle>
@@ -183,6 +140,49 @@ export default function HomePage() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Quick Actions moved to bottom */}
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Link href="/appointments">
+                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">Book Appointment</p>
+                    <p className="text-sm text-gray-500">Schedule a visit</p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="/ai-assistant">
+                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
+                  <Bot className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">AI Assistant</p>
+                    <p className="text-sm text-gray-500">Get health advice</p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="/health-records">
+                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
+                  <FileText className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">View Records</p>
+                    <p className="text-sm text-gray-500">Medical history</p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="/profile">
+                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
+                  <User className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">Update Profile</p>
+                    <p className="text-sm text-gray-500">Manage account</p>
+                  </div>
+                </a>
+              </Link>
+            </div>
           </div>
         </div>
       </main>

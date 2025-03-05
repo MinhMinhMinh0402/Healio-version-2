@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
-import type { CompletionOptions, CompletionResponse } from "deepseek-api";
 
 type SymptomCategory = 
   | "Head & Neurological" 
@@ -48,32 +47,23 @@ Remember to emphasize that this is an AI preliminary analysis and not a substitu
       const response = await result.response;
       return response.text();
     } catch (error) {
-      console.log("Gemini API failed, trying DeepSeek...", error);
+      console.log("Gemini API error:", error);
 
       try {
-        console.log("Attempting to use DeepSeek...");
-        const { default: deepseek } = await import("deepseek-api");
-        const options: CompletionOptions = {
-          prompt,
-          model: "deepseek-chat",
-          maxTokens: 1000,
-        };
-        const result = await deepseek.complete(options);
-        return result.choices[0].text;
-      } catch (error) {
-        console.log("DeepSeek API failed, trying OpenAI...", error);
+        console.log("Attempting to use OpenAI as fallback...");
+        const completion = await this.openai.chat.completions.create({
+          messages: [{ role: "user", content: prompt }],
+          model: "gpt-3.5-turbo",
+        });
 
-        try {
-          console.log("Attempting to use OpenAI...");
-          const completion = await this.openai.chat.completions.create({
-            messages: [{ role: "user", content: prompt }],
-            model: "gpt-3.5-turbo",
-          });
-          return completion.choices[0].message.content || "Failed to get AI analysis. Please try again later.";
-        } catch (error) {
-          console.error("All AI providers failed:", error);
-          throw new Error("All AI providers are currently unavailable. Please try again later.");
+        if (!completion.choices[0].message.content) {
+          throw new Error("No response from AI");
         }
+
+        return completion.choices[0].message.content;
+      } catch (error) {
+        console.error("All AI providers failed:", error);
+        throw new Error("Our AI system is temporarily unavailable. Please try again in a few moments.");
       }
     }
   }
