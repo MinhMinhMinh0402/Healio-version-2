@@ -2,26 +2,36 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation } from "@tanstack/react-query";
-import { Bot, Brain, Loader2 } from "lucide-react";
+import { Brain, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 
+type SymptomCategory = 
+  | "Head & Neurological" 
+  | "Chest & Respiratory" 
+  | "Abdominal" 
+  | "Musculoskeletal" 
+  | "Skin";
+
 export default function AiAssistantPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [category, setCategory] = useState<SymptomCategory | null>(null);
   const [symptoms, setSymptoms] = useState("");
   const [analysis, setAnalysis] = useState<string | null>(null);
 
   const analyzeSymptoms = useMutation({
-    mutationFn: async (symptoms: string) => {
+    mutationFn: async (data: { category: SymptomCategory; symptoms: string }) => {
       const res = await apiRequest("POST", "/api/ai-analysis", {
         userId: user?.id,
-        symptoms,
-        analysis: "Analysis will be provided here", // In a real app, this would come from an AI service
-        date: new Date(),
+        category: data.category,
+        symptoms: data.symptoms,
+        date: new Date().toISOString(),
       });
       return res.json();
     },
@@ -32,40 +42,87 @@ export default function AiAssistantPage() {
         description: "Your symptoms have been analyzed",
       });
     },
+    onError: (error: Error) => {
+      toast({
+        title: "Analysis Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
+
+  const handleSubmit = () => {
+    if (!category || !symptoms.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a category and describe your symptoms",
+        variant: "destructive",
+      });
+      return;
+    }
+    analyzeSymptoms.mutate({ category, symptoms });
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
       <SidebarNav />
-      
+
       <main className="flex-1 overflow-y-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">AI Health Assistant</h1>
+        <h1 className="text-2xl font-bold mb-6">AI Diagnosis</h1>
 
         <div className="grid md:grid-cols-2 gap-6">
           <Card>
             <CardContent className="pt-6">
+              <div className="mb-6">
+                <Label className="text-base font-medium mb-3 block">Symptom Category</Label>
+                <RadioGroup
+                  value={category || ""}
+                  onValueChange={(value) => setCategory(value as SymptomCategory)}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Head & Neurological" id="head" />
+                    <Label htmlFor="head">Head & Neurological</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Chest & Respiratory" id="chest" />
+                    <Label htmlFor="chest">Chest & Respiratory</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Abdominal" id="abdominal" />
+                    <Label htmlFor="abdominal">Abdominal</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Musculoskeletal" id="musculoskeletal" />
+                    <Label htmlFor="musculoskeletal">Musculoskeletal</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Skin" id="skin" />
+                    <Label htmlFor="skin">Skin</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-2">
-                  Describe Your Symptoms
-                </label>
+                <Label className="text-base font-medium mb-3 block">Describe your symptoms</Label>
                 <Textarea
                   placeholder="Please describe your symptoms in detail..."
                   value={symptoms}
                   onChange={(e) => setSymptoms(e.target.value)}
-                  className="min-h-[200px]"
+                  className="min-h-[200px] bg-gray-50"
                 />
               </div>
+
               <Button
-                onClick={() => analyzeSymptoms.mutate(symptoms)}
-                disabled={!symptoms || analyzeSymptoms.isPending}
-                className="w-full"
+                onClick={handleSubmit}
+                disabled={!category || !symptoms.trim() || analyzeSymptoms.isPending}
+                className="w-full bg-primary text-white"
               >
                 {analyzeSymptoms.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <Bot className="mr-2 h-4 w-4" />
+                  "Analyze Symptoms"
                 )}
-                Get AI Analysis
               </Button>
             </CardContent>
           </Card>
@@ -76,14 +133,21 @@ export default function AiAssistantPage() {
                 <Brain className="h-5 w-5 text-primary" />
                 <h2 className="text-lg font-medium">AI Analysis</h2>
               </div>
-              
+
               {analysis ? (
                 <div className="prose prose-sm">
-                  <p>{analysis}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap">{analysis}</p>
                 </div>
               ) : (
                 <div className="text-center text-gray-500 mt-8">
-                  Describe your symptoms and our AI will provide a preliminary analysis
+                  {analyzeSymptoms.isPending ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                      <p>Analyzing your symptoms...</p>
+                    </div>
+                  ) : (
+                    "Describe your symptoms and our AI will provide a preliminary analysis"
+                  )}
                 </div>
               )}
             </CardContent>

@@ -1,10 +1,11 @@
 import { SidebarNav } from "@/components/sidebar-nav";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Bot, FileText, User, Heart, Activity } from "lucide-react";
+import { Calendar, Bot, FileText, User, Heart, Activity, PlusCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { Appointment, HealthRecord } from "@shared/schema";
+import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -31,7 +32,58 @@ export default function HomePage() {
 
       <main className="flex-1 overflow-y-auto p-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Welcome back, {user?.fullName}</h1>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">Welcome back, {user?.fullName}</h1>
+            <Link href="/ai-assistant">
+              <Button className="bg-primary text-white hover:bg-primary/90">
+                <PlusCircle className="h-5 w-5 mr-2" />
+                Start AI Diagnosis
+              </Button>
+            </Link>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-white p-6 rounded-xl shadow-sm mb-6">
+            <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Link href="/appointments">
+                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">Book Appointment</p>
+                    <p className="text-sm text-gray-500">Schedule a visit</p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="/ai-assistant">
+                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
+                  <Bot className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">AI Assistant</p>
+                    <p className="text-sm text-gray-500">Get health advice</p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="/health-records">
+                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
+                  <FileText className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">View Records</p>
+                    <p className="text-sm text-gray-500">Medical history</p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="/profile">
+                <a className="flex items-center gap-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors">
+                  <User className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">Update Profile</p>
+                    <p className="text-sm text-gray-500">Manage account</p>
+                  </div>
+                </a>
+              </Link>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <Card className="bg-blue-50 border-none">
@@ -122,10 +174,10 @@ export default function HomePage() {
               <CardContent>
                 <div className="text-center py-6">
                   <Bot className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-4">Ask me anything about your health</p>
+                  <p className="text-sm text-gray-600 mb-4">Get instant AI-powered health analysis</p>
                   <Link href="/ai-assistant">
-                    <a className="inline-block bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
-                      Start Chat
+                    <a className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium">
+                      Start AI Diagnosis
                     </a>
                   </Link>
                 </div>

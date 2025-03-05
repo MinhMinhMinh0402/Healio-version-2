@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { insertAppointmentSchema, insertHealthRecordSchema, insertAiAnalysisSchema } from "@shared/schema";
+import { aiService } from "./ai-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
@@ -33,9 +34,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // AI Analysis
   app.post("/api/ai-analysis", async (req, res) => {
-    const analysis = insertAiAnalysisSchema.parse(req.body);
-    const created = await storage.createAiAnalysis(analysis);
-    res.status(201).json(created);
+    try {
+      const { category, symptoms } = insertAiAnalysisSchema.parse(req.body);
+      const analysis = await aiService.analyzeSymptoms({ category, symptoms });
+      res.status(201).json({ analysis });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
   });
 
   app.get("/api/ai-analysis/:userId", async (req, res) => {
