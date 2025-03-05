@@ -24,15 +24,20 @@ class AIService {
 
   private handlePredefinedQueries(symptoms: string): string | null {
     const lowerCaseSymptoms = symptoms.toLowerCase().trim();
+    console.log("Checking predefined query:", lowerCaseSymptoms);
 
-    if (lowerCaseSymptoms === "what is healio?") {
+    // Check for variations of "What is Healio?"
+    if (lowerCaseSymptoms.includes("what is healio") || lowerCaseSymptoms === "what's healio" || lowerCaseSymptoms === "what is healio?") {
       return "HEALIO provides features such as monitoring health indicators (heart rate, blood pressure, ...), scheduling appointments, online consultation with doctors, storing medical records, and more.";
     }
 
-    if (lowerCaseSymptoms === "today im so tired" || lowerCaseSymptoms === "i'm tired" || lowerCaseSymptoms === "im tired") {
+    // Check for variations of tired symptoms
+    const tiredPhrases = ["today im so tired", "i'm tired", "im tired", "feeling tired", "i am tired"];
+    if (tiredPhrases.some(phrase => lowerCaseSymptoms.includes(phrase))) {
       return "If you feel tired due to work, maybe you need a break, relax after stressful working hours and find something delicious to eat, you will feel better or if the fatigue does not come from being busy with work, please provide more information so that I can analyze and diagnose you as soon as possible";
     }
 
+    console.log("No predefined response found");
     return null;
   }
 
@@ -55,6 +60,7 @@ Remember to emphasize that this is an AI preliminary analysis and not a substitu
     // Check for predefined responses first
     const predefinedResponse = this.handlePredefinedQueries(symptoms);
     if (predefinedResponse) {
+      console.log("Returning predefined response");
       return predefinedResponse;
     }
 
