@@ -57,40 +57,45 @@ Remember to emphasize that this is an AI preliminary analysis and not a substitu
   }
 
   async analyzeSymptoms({ category, symptoms }: AIAnalysisRequest): Promise<string> {
-    // Check for predefined responses first
-    const predefinedResponse = this.handlePredefinedQueries(symptoms);
-    if (predefinedResponse) {
-      console.log("Returning predefined response");
-      return predefinedResponse;
-    }
-
-    const prompt = this.getPrompt(category, symptoms);
-
     try {
-      console.log("Attempting to use Gemini...");
-      const model = this.gemini.getGenerativeModel({ model: "gemini-pro" });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
-    } catch (error) {
-      console.log("Gemini API error:", error);
+      // Check for predefined responses first
+      const predefinedResponse = this.handlePredefinedQueries(symptoms);
+      if (predefinedResponse) {
+        console.log("Returning predefined response");
+        return predefinedResponse;
+      }
+
+      const prompt = this.getPrompt(category, symptoms);
 
       try {
-        console.log("Attempting to use OpenAI as fallback...");
-        const completion = await this.openai.chat.completions.create({
-          messages: [{ role: "user", content: prompt }],
-          model: "gpt-3.5-turbo",
-        });
-
-        if (!completion.choices[0].message.content) {
-          throw new Error("No response from AI");
-        }
-
-        return completion.choices[0].message.content;
+        console.log("Attempting to use Gemini...");
+        const model = this.gemini.getGenerativeModel({ model: "gemini-pro" });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
       } catch (error) {
-        console.error("All AI providers failed:", error);
-        throw new Error("Our AI system is temporarily unavailable. Please try again in a few moments.");
+        console.log("Gemini API error:", error);
+
+        try {
+          console.log("Attempting to use OpenAI as fallback...");
+          const completion = await this.openai.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "gpt-3.5-turbo",
+          });
+
+          if (!completion.choices[0].message.content) {
+            throw new Error("No response from AI");
+          }
+
+          return completion.choices[0].message.content;
+        } catch (error) {
+          console.error("All AI providers failed:", error);
+          throw new Error("Our AI system is temporarily unavailable. Please try again in a few moments.");
+        }
       }
+    } catch (error) {
+      console.error("Error in analyzeSymptoms:", error);
+      throw error;
     }
   }
 }

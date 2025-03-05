@@ -35,7 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI Analysis
   app.post("/api/ai-analysis", async (req, res) => {
     try {
-      const { category, symptoms } = insertAiAnalysisSchema.parse(req.body);
+      const { category, symptoms } = req.body;
       const analysis = await aiService.analyzeSymptoms({ category, symptoms });
       res.status(201).json({ analysis });
     } catch (error: any) {
