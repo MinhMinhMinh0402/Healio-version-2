@@ -101,7 +101,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-sm font-medium">Recent Health Records</CardTitle>
               </CardHeader>
@@ -109,13 +109,13 @@ export default function HomePage() {
                 {records?.length === 0 ? (
                   <p className="text-sm text-gray-500">No health records found</p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-2 -mx-2 px-2">
                     {records?.slice(0, 3).map((record) => (
                       <div key={record.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <FileText className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <p className="font-medium">{record.diagnosis}</p>
-                          <p className="text-sm text-gray-500">Dr. {record.doctor} • {record.date}</p>
+                        <FileText className="h-5 w-5 flex-shrink-0 text-gray-400" />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium truncate">{record.diagnosis}</p>
+                          <p className="text-sm text-gray-500 truncate">Dr. {record.doctor} • {record.date}</p>
                         </div>
                       </div>
                     ))}

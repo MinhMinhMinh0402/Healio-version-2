@@ -22,6 +22,20 @@ class AIService {
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
   }
 
+  private handlePredefinedQueries(symptoms: string): string | null {
+    const lowerCaseSymptoms = symptoms.toLowerCase().trim();
+
+    if (lowerCaseSymptoms === "what is healio?") {
+      return "HEALIO provides features such as monitoring health indicators (heart rate, blood pressure, ...), scheduling appointments, online consultation with doctors, storing medical records, and more.";
+    }
+
+    if (lowerCaseSymptoms === "today im so tired" || lowerCaseSymptoms === "i'm tired" || lowerCaseSymptoms === "im tired") {
+      return "If you feel tired due to work, maybe you need a break, relax after stressful working hours and find something delicious to eat, you will feel better or if the fatigue does not come from being busy with work, please provide more information so that I can analyze and diagnose you as soon as possible";
+    }
+
+    return null;
+  }
+
   private getPrompt(category: SymptomCategory, symptoms: string): string {
     return `As a medical AI assistant, analyze the following ${category} symptoms and provide a preliminary analysis. Note any potential serious conditions that require immediate medical attention.
 
@@ -38,6 +52,12 @@ Remember to emphasize that this is an AI preliminary analysis and not a substitu
   }
 
   async analyzeSymptoms({ category, symptoms }: AIAnalysisRequest): Promise<string> {
+    // Check for predefined responses first
+    const predefinedResponse = this.handlePredefinedQueries(symptoms);
+    if (predefinedResponse) {
+      return predefinedResponse;
+    }
+
     const prompt = this.getPrompt(category, symptoms);
 
     try {
