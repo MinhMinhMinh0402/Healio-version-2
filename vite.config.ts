@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
-  base: '/Healio-version-2/', // Add this line for GitHub Pages
+  base: '/Healio-version-2/', // This is correct for GitHub Pages
   plugins: [
     react(),
     runtimeErrorOverlay(),
@@ -31,11 +31,11 @@ export default defineConfig({
   },
   root: path.resolve(__dirname, "client"),
   build: {
-    outDir: path.resolve(__dirname, "dist"), // Changed from dist/public to dist
+    outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks: undefined // Ensures proper code splitting
+        manualChunks: undefined
       }
     }
   },
@@ -43,5 +43,4 @@ export default defineConfig({
     port: 3000,
     host: true
   }
-});  
-
+});
